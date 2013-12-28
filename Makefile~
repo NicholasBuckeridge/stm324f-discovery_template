@@ -79,7 +79,7 @@ TOOLCHAIN = arm-none-eabi-
 CC = $(TOOLCHAIN)gcc
 CXX = $(TOOLCHAIN)g++
 AS = $(TOOLCHAIN)gcc
-LD = $(TOOLCHAIN)gcc
+LD = $(TOOLCHAIN)g++
 OBJCOPY = $(TOOLCHAIN)objcopy
 
 # Architecture configuration
@@ -102,20 +102,33 @@ CXXFLAGS += -std=c++11
 LDFLAGS=$(ARCH_FLAGS)
 LDFLAGS+=-Wl,--gc-sections
 LDFLAGS+=$(foreach i, $(HEADERS), -L$(i))
-LDFLAGS+=-T $(LDSCRIPT)
+LDFLAGS+=-T $(LINKER_DIR)stm32_flash.ld
 
 
 
 
 
-
+#vpath %.c SOURCE_DIR SOURCE_LIBRARY_DIR SOURCE_PERIPHERAL_DIR
+#vpath %.cpp SOURCE_DIR SOURCE_LIBRARY_DIR SOURCE_PERIPHERAL_DIR
 
 
 
 #.PHONY print
 
-all:
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(TARGET_ELF)
+all:$(_OBJ_FILES)
+	$(LD) $(LDFLAGS) $(_OBJ_FILES) -o $(TARGET_ELF)
+$(OBJECT_DIR)%.o: $(SOURCE_DIR)%.c
+	$(CC) $(CXXFLAGS) $^ -c -o $@
+$(OBJECT_DIR)%.o: $(SOURCE_DIR)%.cpp
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJECT_DIR)%.o: $(SOURCE_LIBRARY_DIR)%.c
+	$(CC) $(CXXFLAGS) $^ -c -o $@
+$(OBJECT_DIR)%.o: $(SOURCE_LIBRARY_DIR)%.cpp
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJECT_DIR)%.o: $(SOURCE_PERIPHERAL_DIR)%.c
+	$(CC) $(CXXFLAGS) $^ -c -o $@
+$(OBJECT_DIR)%.o: $(SOURCE_PERIPHERAL_DIR)%.cpp
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 print:
 	@echo name of application:

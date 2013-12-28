@@ -118,11 +118,11 @@ int main(void)
 	//i=0x1ffffff;
 	while (1)
 	{
-		printf("\r\nWelcome to WaveShare STM32F4 series MCU Board Open407Z\r\n");
-		//USART_SendData(Open_USART, (uint8_t) 'N');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
-		//USART_SendData(Open_USART, (uint8_t) 'i');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
-		//USART_SendData(Open_USART, (uint8_t) 'c');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
-		//USART_SendData(Open_USART, (uint8_t) '\n');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
+		//printf("\r\nWelcome to WaveShare STM32F4 series MCU Board Open407Z\r\n");
+		USART_SendData(Open_USART, (uint8_t) 'N');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
+		USART_SendData(Open_USART, (uint8_t) 'i');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
+		USART_SendData(Open_USART, (uint8_t) 'c');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
+		USART_SendData(Open_USART, (uint8_t) '\n');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
 		for(uint32_t ii = 0; ii<0xFFFFFFF; ii++){
 		for(uint32_t iii = 0; iii<0x1; iii++){
 		}
@@ -150,7 +150,7 @@ void USARTx_IRQHANDLER(void)
 {
   if(USART_GetITStatus(Open_USART, USART_IT_RXNE) != RESET)
   { 
-  		//USART_ClearITPendingBit(USART2,USART_IT_RXNE);
+  		USART_ClearITPendingBit(USART2,USART_IT_RXNE);
 		//printf("\n\rUSART Hyperterminal Interrupts Receive a word: %c\n\r",USART_ReceiveData(Open_USART));
 		USART_SendData(Open_USART, (uint8_t) 'D');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
 		USART_SendData(Open_USART, (uint8_t) 'a');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
