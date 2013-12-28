@@ -21,16 +21,18 @@ _C_FILES = $(wildcard $(SOURCE_DIR)*.c)
 _CPP_FILES = $(wildcard $(SOURCE_DIR)*.cpp)
 _STA_FILES = $(wildcard $(STARTUP_DIR)*.s)
 _SRC_FILES = $(_CPP_FILES) $(_C_FILES) # $(_STA_FILES)
-_OBJ_FILES = $(patsubst $(SOURCE_DIR)%.cpp,$(OBJECT_DIR)%.o,$(_CPP_FILES:$(SOURCE_DIR)%=%))
-_OBJ_FILES += $(patsubst $(SOURCE_DIR)%.c,$(OBJECT_DIR)%.o,$(_C_FILES:$(SOURCE_DIR)%=%))
-_OBJ_FILES += $(patsubst $(SOURCE_DIR)%.s,$(OBJECT_DIR)%.o,$(_STA_FILES:$(STARTUP_DIR)%=%))
+_OBJ_FILES = $(addprefix $(OBJECT_DIR),$(notdir $(_CPP_FILES:.cpp=.o)))
+#_OBJ_FILES = $(patsubst $(SOURCE_DIR)%.cpp,$(OBJECT_DIR)%.o,$(_CPP_FILES:$(SOURCE_DIR)%=%))
+#_OBJ_FILES += $(patsubst $(SOURCE_DIR)%.c,$(OBJECT_DIR)%.o,$(_C_FILES:$(SOURCE_DIR)%=%))
+#_OBJ_FILES += $(patsubst $(SOURCE_DIR)%.s,$(OBJECT_DIR)%.o,$(_STA_FILES:$(STARTUP_DIR)%=%))
+_LNK_FILES = $(wildcard $(LINKER_DIR)*.ld)
 
 #file names without paths
-C_FILES = $(_C_FILES:$(SRC_DIR)%=%)
-CPP_FILES = $(_CPP_FILES:$(SRC_DIR)%=%)
-STA_FILES = $(_STA_FILES:$(STA_DIR)%=%)
+C_FILES = $(_C_FILES:$(SOURCE_DIR)%=%)
+CPP_FILES = $(_CPP_FILES:$(SOURCE_DIR)%=%)
+STA_FILES = $(_STA_FILES:$(STARTUP_DIR)%=%)
 SRC_FILES = $(CPP_FILES) $(C_FILES) $(STA_FILES)
-OBJ_FILES = $(_OBJ_FILES:$(OBJ_DIR)%=%)
+OBJ_FILES = $(_OBJ_FILES:$(OBJECT_DIR)%=%)
 
 #include directories
 HEADERS = 
@@ -63,6 +65,28 @@ AS = $(TOOLCHAIN)gcc
 LD = $(TOOLCHAIN)gcc
 OBJCOPY = $(TOOLCHAIN)objcopy
 
+# Architecture configuration
+ARCH_FLAGS=-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 
+
+# gcc compiler flags
+CFLAGS += -O0 -ggdb3
+CFLAGS += $(ARCH_FLAGS)
+CFLAGS += -flto
+CFLAGS += -ffunction-sections
+CFLAGS +=  -fdata-sections
+CFLAGS += $(foreach i, $(HEADERS), -I$(i))
+
+# g++ compiler flags
+CXXFLAGS = $(CFLAGS)
+CXXFLAGS += -fno-rtti -fno-exceptions
+CXXFLAGS += -std=c++11
+
+# Flags for gcc as linker
+LDFLAGS=$(ARCH_FLAGS)
+LDFLAGS+=-Wl,--gc-sections
+LDFLAGS+=$(foreach i, $(HEADERS), -L$(i))
+LDFLAGS+=-T $(LDSCRIPT)
+
 
 print:
 	@echo name of application:
@@ -88,4 +112,11 @@ print:
 	@echo _STA_FILES = $(_STA_FILES)
 	@echo _SRC_FILES = $(_SRC_FILES)
 	@echo _OBJ_FILES = $(_OBJ_FILES)
+	@echo _LNK_FILES = $(_LNK_FILES)
+	@echo
+	@echo C_FILES = $(C_FILES)
+	@echo CPP_FILES = $(CPP_FILES)
+	@echo STA_FILES = $(STA_FILES)
+	@echo SRC_FILES = $(SRC_FILES)
+	@echo OBJ_FILES = $(OBJ_FILES)
 
