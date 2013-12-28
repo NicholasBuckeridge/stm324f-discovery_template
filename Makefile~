@@ -88,10 +88,4 @@ print:
 	@echo _STA_FILES = $(_STA_FILES)
 	@echo _SRC_FILES = $(_SRC_FILES)
 	@echo _OBJ_FILES = $(_OBJ_FILES)
-	@echo
-	@echo C_FILES = $(C_FILES)
-	@echo CPP_FILES = $(CPP_FILES)
-	@echo STA_FILES = $(STA_FILES)
-	@echo SRC_FILES = $(SRC_FILES)
-	@echo OBJ_FILES = $(OBJ_FILES)
 
