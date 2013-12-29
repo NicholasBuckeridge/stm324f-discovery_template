@@ -1,3 +1,21 @@
+#	author: Nicholas Buckeridge
+#	email: bucknich@gmail.com
+#	date: 30 December 2013 7:53AM
+#	description:	This is yet another makefile for the stm32f4. It was built for
+#			beginners like myself and the advanced user that wants to get 
+#			the job done quikly and simply. I have added support for  the
+#			stm32f4 peripherals library and the newlib stubs for OS level
+#			functionality. Newlib stubs can be found in
+#			(project root)/library/default/src/syscall.cpp. This project is
+#			a C++ compiler project, if changes are necessary you can change
+#			the makefile variables to suite your needs. This is a simple
+#			project. Any code you have written (*.cpp/*.c) can be placed in
+#			the (project root)/code/src/ and headers go in
+#			(project root)/code/inc folder. The makefile is designed to
+#			automaticly detect any source files within the src directory and
+#			compile them into the project.
+
+
 #name of application
 TARGET = main
 #name of target outputs
@@ -22,10 +40,10 @@ SOURCE_LIBRARY_DIR = $(PERIPHERAL_DIR)src/
 SOURCE_PERIPHERAL_DIR = $(DEFAULT_DIR)src/
 
 # files with paths attached
-_C_FILES = $(wildcard $(SOURCE_DIR)*.c) # $(wildcard $(PERIPHERAL_DIR)src/*.c)
+_C_FILES = $(wildcard $(SOURCE_DIR)*.c)
 _C_DEFAULT_FILES = $(wildcard $(DEFAULT_DIR)src/*.c)
 _C_PERIPHERAL_FILES = $(wildcard $(PERIPHERAL_DIR)src/*.c)
-_CPP_FILES = $(wildcard $(SOURCE_DIR)*.cpp) # $(wildcard $(PERIPHERAL_DIR)src/*.cpp)
+_CPP_FILES = $(wildcard $(SOURCE_DIR)*.cpp)
 _CPP_DEFAULT_FILES = $(wildcard $(DEFAULT_DIR)src/*.cpp)
 _CPP_PERIPHERAL_FILES = $(wildcard $(PERIPHERAL_DIR)src/*.cpp)
 _STA_FILES = $(wildcard $(STARTUP_DIR)*.s)
@@ -55,32 +73,17 @@ OBJ_FILES = $(_OBJ_FILES:$(OBJECT_DIR)%=%)
 HEADERS = $(CODE_DIR)inc/
 HEADERS += $(LIBRARY_DIR)default/inc/
 HEADERS += $(LIBRARY_DIR)peripherals/inc/
-HEADERS += 
-HEADERS += 
-HEADERS += 
-HEADERS += 
-HEADERS += 
-HEADERS += 
-HEADERS += 
-
-
-LIB_PATH =
-
-
-
-
-
-#libraries to link
-
-
 
 # Tool configuration
-TOOLCHAIN = arm-none-eabi-
-CC = $(TOOLCHAIN)gcc
+TOOLCHAIN_PATH = #leave empty if your toolchain has been added to the $PATH shell variable
+TOOLCHAIN = $(TOOLCHAIN_PATH)arm-none-eabi-
+CC = $(TOOLCHAIN)g++
 CXX = $(TOOLCHAIN)g++
 AS = $(TOOLCHAIN)gcc
 LD = $(TOOLCHAIN)g++
 OBJCOPY = $(TOOLCHAIN)objcopy
+ST_FLASH_PATH = #leave empty if your toolchain has been added to the $PATH shell variable
+
 
 # Architecture configuration
 ARCH_FLAGS=-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 
@@ -112,11 +115,15 @@ LDFLAGS+=-T $(LINKER_DIR)stm32_flash.ld
 #vpath %.cpp SOURCE_DIR SOURCE_LIBRARY_DIR SOURCE_PERIPHERAL_DIR
 
 
+all: $(OUTPUT_DIR)$(TARGET_ELF)
+	$(OBJCOPY) -O ihex $(OUTPUT_DIR)$(TARGET_ELF) $(OUTPUT_DIR)$(TARGET_HEX)
+	$(OBJCOPY) -O binary $(OUTPUT_DIR)$(TARGET_ELF) $(OUTPUT_DIR)$(TARGET_BIN)
 
-#.PHONY print
+#compile all objects into single executable
+$(OUTPUT_DIR)$(TARGET_ELF):$(_OBJ_FILES)
+	$(LD) $(LDFLAGS) $(_OBJ_FILES) -o $(OUTPUT_DIR)$(TARGET_ELF)
 
-all:$(_OBJ_FILES)
-	$(LD) $(LDFLAGS) $(_OBJ_FILES) -o $(TARGET_ELF)
+#generate objects
 $(OBJECT_DIR)%.o: $(SOURCE_DIR)%.c
 	$(CC) $(CXXFLAGS) $^ -c -o $@
 $(OBJECT_DIR)%.o: $(SOURCE_DIR)%.cpp
@@ -132,7 +139,17 @@ $(OBJECT_DIR)%.o: $(SOURCE_PERIPHERAL_DIR)%.cpp
 $(OBJECT_DIR)%.o: $(STARTUP_DIR)%.s
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
+clean:
+	rm -f $(_OBJ_FILES)
+	rm -f $(OUTPUT_DIR)$(TARGET_ELF)
+	rm -f $(OUTPUT_DIR)$(TARGET_HEX)
+	rm -f $(OUTPUT_DIR)$(TARGET_BIN)
+flash:
+	st-flash write $(OUTPUT_DIR)$(TARGET_BIN) 0x8000000
+flash_erase:
+	st-flash erase
 
+#debug variables
 print:
 	@echo name of application:
 	@echo TARGET = $(TARGET)
@@ -173,3 +190,5 @@ print:
 	@echo SRC_FILES = $(SRC_FILES)
 	@echo OBJ_FILES = $(OBJ_FILES)
 
+help:
+	@echo this is to do still. will print out how to use this make file.

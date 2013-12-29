@@ -112,10 +112,7 @@ private:
 
 int main(void)
 {
-	//uint32_t i;
-	//USART_Configuration();
-	//USART_NVIC_Config();
-	//i=0x1ffffff;
+	sys *pSys = new sys();
 	while (1)
 	{
 		//printf("\r\nWelcome to WaveShare STM32F4 series MCU Board Open407Z\r\n");
@@ -123,10 +120,10 @@ int main(void)
 		USART_SendData(Open_USART, (uint8_t) 'i');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
 		USART_SendData(Open_USART, (uint8_t) 'c');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
 		USART_SendData(Open_USART, (uint8_t) '\n');while (USART_GetFlagStatus(Open_USART, USART_FLAG_TC) == RESET){}
-		for(uint32_t ii = 0; ii<0xFFFFFFF; ii++){
-		for(uint32_t iii = 0; iii<0x1; iii++){
-		}
-		}
+		//for(uint32_t ii = 0; ii<0x1FFFFFF; ii++){
+		//for(uint32_t iii = 0; iii<0x1; iii++){
+		//}
+		//}
 	}
 }
 
@@ -221,7 +218,7 @@ void sys::USART_Configuration(void)
          - Receive and transmit    
  */
 
-  USART_InitStructure.USART_BaudRate = 9600;
+  USART_InitStructure.USART_BaudRate = 115200;
   USART_InitStructure.USART_WordLength = USART_WordLength_8b;
   USART_InitStructure.USART_StopBits = USART_StopBits_1;
   USART_InitStructure.USART_Parity = USART_Parity_No;
